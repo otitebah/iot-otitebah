@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment / credentials
+.env
+.env.*
+*.pem
+*.key
+*.crt
+
+# Logs and temp
+*.log
+*.tmp
+*.bak
+
+# Kubernetes cluster artifacts
+kubeconfig
+*.kubeconfig
+.kube/
+
+# Defensive: Kubernetes Secret manifests should never be pushed
+secrets/
+*-secret.yaml
+*_secret.yaml
+
+# Markdown (personal study notes, drafts)
+*.md
