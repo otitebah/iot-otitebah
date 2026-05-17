@@ -18,7 +18,9 @@ kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 kubectl create namespace dev    --dry-run=client -o yaml | kubectl apply -f -
 
 echo "[3/5] Installing Argo CD..."
-kubectl apply -n argocd \
+# --server-side is required: Argo CD's applicationsets CRD exceeds the
+# 256 KiB last-applied-configuration annotation limit of client-side apply.
+kubectl apply --server-side -n argocd \
   -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 echo "[4/5] Waiting for Argo CD server to become available (up to 10 minutes)..."
