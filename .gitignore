@@ -28,6 +28,9 @@ kubeconfig
 *.kubeconfig
 .kube/
 
+# Vagrant artifacts
+.vagrant/
+
 # Defensive: Kubernetes Secret manifests should never be pushed
 secrets/
 *-secret.yaml
