@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app3
+  template:
+    metadata:
+      labels:
+        app: app3
+    spec:
+      containers:
+      - name: app3
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        configMap:
+          name: app3-html
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app3-html
+  namespace: default
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>App 3</title>
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #2ecc71; color: white; }
+        h1 { font-size: 3em; }
+      </style>
+    </head>
+    <body>
+      <h1>✨ Application 3</h1>
+      <p>This is App 3 (Default Application)</p>
+      <p>You are seeing this because no specific Host header matched</p>
+    </body>
+    </html>
