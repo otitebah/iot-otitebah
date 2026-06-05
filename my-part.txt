@@ -1,8 +1,0 @@
-**Person A — Part 1 + Part 2**
-
-- Write the `Vagrantfile` for Part 1 (two VMs: `<login>S` at 192.168.56.110, `<login>SW` at 192.168.56.111, SSH no-password, K3s controller + agent via provisioning scripts).
-- Verify `kubectl get nodes` shows both Ready.
-- Write the Part 2 `Vagrantfile` (single VM, K3s server).
-- Write the K3s manifests for Part 2: 3 Deployments (app2 with 3 replicas), 3 Services, 1 Ingress routing by `Host` header (app1.com → app1, app2.com → app2, default → app3).
-- Test with `curl -H "Host: app1.com" 192.168.56.110` etc.
-- Deliverables: `p1/` and `p2/` folders, each with `Vagrantfile`, `scripts/`, `confs/`.
