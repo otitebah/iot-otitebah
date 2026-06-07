@@ -16,8 +16,9 @@ fi
 
 echo "[3/5] Installing kubectl..."
 if ! command -v kubectl &>/dev/null; then
+  ARCH="$(dpkg --print-architecture)"   # "amd64" on x86_64, "arm64" on Apple Silicon VMs
   KUBECTL_VERSION=$(curl -Ls https://dl.k8s.io/release/stable.txt)
-  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl"
   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   rm kubectl
 else
@@ -33,8 +34,9 @@ fi
 
 echo "[5/5] Installing Argo CD CLI..."
 if ! command -v argocd &>/dev/null; then
+  ARCH="$(dpkg --print-architecture)"
   curl -sSL -o argocd \
-    https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+    "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-${ARCH}"
   sudo install -m 555 argocd /usr/local/bin/argocd
   rm argocd
 else
