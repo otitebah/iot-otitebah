@@ -10,7 +10,11 @@ Vagrant.configure("2") do |config|
     server.vm.provider "virtualbox" do |v|
       v.memory = 1024
       v.cpus = 1
-      v.customize ["modifyvm", :id, "--name", "werrahmaS"]
+      # NOTE: no --name customization here on purpose. p1 already registers a
+      # VirtualBox VM called "werrahmaS", and two VMs cannot share a name, so
+      # forcing it here makes `vagrant up` fail while p1 still exists on disk.
+      # The guest hostname is still werrahmaS (set above), which is what the
+      # subject requires.
     end
 
     # SSH configuration

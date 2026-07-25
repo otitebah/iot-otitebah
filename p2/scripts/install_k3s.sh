@@ -65,8 +65,19 @@ if [ ! -d "$CONF_DIR" ]; then
     exit 1
 fi
 
-# Traefik is installed by K3s via a Helm job; the Ingress is useless until its
-# CRDs and controller exist.
+# Traefik is installed by K3s via a Helm job, asynchronously. The Deployment
+# does not exist yet at this point, so we must wait for it to APPEAR before we
+# can wait for it to become ready ("rollout status" fails instantly on a
+# missing Deployment instead of waiting for it).
+echo "Waiting for Traefik to appear..."
+for i in $(seq 1 60); do
+    if /usr/local/bin/kubectl -n kube-system get deployment traefik >/dev/null 2>&1; then
+        echo "Traefik deployment found after ${i} attempt(s)."
+        break
+    fi
+    sleep 5
+done
+
 echo "Waiting for Traefik to be ready..."
 /usr/local/bin/kubectl -n kube-system rollout status deployment/traefik --timeout=300s
 
