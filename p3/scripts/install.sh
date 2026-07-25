@@ -1,6 +1,42 @@
 #!/bin/bash
 set -e
 
+# The project is defended inside a Linux VM, where this script installs
+# everything from scratch. The macOS branch exists so the same script can be
+# run on a developer Mac while practising.
+OS="$(uname -s)"
+
+if [ "$OS" = "Darwin" ]; then
+  echo "macOS detected — installing tools with Homebrew."
+
+  if ! command -v brew &>/dev/null; then
+    echo "Homebrew is required: https://brew.sh" >&2
+    exit 1
+  fi
+
+  echo "[1/4] Checking Docker..."
+  if ! command -v docker &>/dev/null; then
+    echo "Installing Docker Desktop (you must launch it once afterwards)..."
+    brew install --cask docker
+  else
+    echo "Docker already installed."
+  fi
+
+  echo "[2/4] Checking kubectl..."
+  command -v kubectl &>/dev/null && echo "kubectl already installed." || brew install kubectl
+
+  echo "[3/4] Checking K3d..."
+  command -v k3d &>/dev/null && echo "K3d already installed." || brew install k3d
+
+  echo "[4/4] Checking Argo CD CLI..."
+  command -v argocd &>/dev/null && echo "Argo CD CLI already installed." || brew install argocd
+
+  echo ""
+  echo "All tools installed."
+  echo "Make sure Docker Desktop is running, then: ./scripts/setup.sh"
+  exit 0
+fi
+
 echo "[1/5] Updating package index..."
 sudo apt-get update
 sudo apt-get install -y curl ca-certificates

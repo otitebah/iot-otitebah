@@ -4,7 +4,7 @@ set -e
 CLUSTER_NAME="iot"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "[1/5] Creating K3d cluster '${CLUSTER_NAME}'..."
+echo "[1/6] Creating K3d cluster '${CLUSTER_NAME}'..."
 if k3d cluster list | grep -q "^${CLUSTER_NAME} "; then
   echo "Cluster '${CLUSTER_NAME}' already exists. Skipping creation."
 else
@@ -13,21 +13,25 @@ else
     --port "8080:30081@loadbalancer"
 fi
 
-echo "[2/5] Creating namespaces..."
+echo "[2/6] Creating namespaces..."
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 kubectl create namespace dev    --dry-run=client -o yaml | kubectl apply -f -
 
-echo "[3/5] Installing Argo CD..."
+echo "[3/6] Installing Argo CD..."
 # --server-side is required: Argo CD's applicationsets CRD exceeds the
 # 256 KiB last-applied-configuration annotation limit of client-side apply.
 kubectl apply --server-side -n argocd \
   -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-echo "[4/5] Waiting for Argo CD server to become available (up to 10 minutes)..."
+echo "[4/6] Waiting for Argo CD server to become available (up to 10 minutes)..."
 kubectl wait --for=condition=available --timeout=600s \
   deployment/argocd-server -n argocd
 
-echo "[5/5] Applying Argo CD Application manifest..."
+echo "[5/6] Exposing Argo CD UI on NodePort 30081 (mapped to host port 8080)..."
+kubectl patch svc argocd-server -n argocd -p \
+  '{"spec": {"type": "NodePort", "ports": [{"port": 443, "nodePort": 30081}]}}'
+
+echo "[6/6] Applying Argo CD Application manifest..."
 kubectl apply -f "${SCRIPT_DIR}/../confs/application.yaml"
 
 echo ""
@@ -38,10 +42,5 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath="{.data.password}" | base64 -d
 echo ""
 echo ""
-echo "To open the Argo CD UI:"
-echo "  kubectl port-forward -n argocd svc/argocd-server 8080:443"
-echo "  Then browse to https://localhost:8080  (user: admin)"
-echo ""
-echo "To test the deployed application:"
-echo "  kubectl port-forward -n dev svc/wil-playground 8888:8888"
-echo "  curl http://localhost:8888/"
+echo "Argo CD UI:  https://localhost:8080  (user: admin)"
+echo "Application: curl http://localhost:8888/"
