@@ -45,6 +45,5 @@ data:
     <body>
       <h1>🎯 Application 2</h1>
       <p>This is App 2 running on K3s (with 3 replicas)</p>
-      <p>Hostname: <%= hostname %></p>
     </body>
     </html>
